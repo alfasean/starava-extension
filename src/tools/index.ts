@@ -230,7 +230,7 @@ export function createTools(deps: ToolDeps): ToolDefinition[] {
     },
     async handler() {
       const id = activityIdFromUrl(await getActiveTabUrl());
-      if (id === null) throw new Error('The active tab is not a Strava activity page.');
+      if (id === null) throw new Error('The active tab is not a Strava activity page. Use list_activities to find the most recent run instead.');
       return { id };
     },
   };
