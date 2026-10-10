@@ -95,4 +95,47 @@ describe('openai adapter', () => {
     await expect(p).rejects.toBeInstanceOf(LlmHttpError);
     await expect(p).rejects.toMatchObject({ status: 401, body: 'bad key' });
   });
+
+  const sseResponse = (frames: object[], tail = '') =>
+    new Response(frames.map((f) => `data: ${JSON.stringify(f)}\n\n`).join('') + tail, { status: 200 });
+  const tcChunk = (args: string, extra: object = {}) => ({
+    choices: [{ index: 0, delta: { tool_calls: [{ index: 0, id: 'c9', function: { name: 'fn', arguments: args }, ...extra }] } }],
+  });
+
+  it('uses the provider option in LlmHttpError', async () => {
+    const f = vi.fn().mockResolvedValue(new Response('no', { status: 401 }));
+    const p = run(createOpenAiAdapter({ apiKey: 'k', model: 'm', provider: 'openai-compatible', fetch: f }), baseReq);
+    await expect(p).rejects.toMatchObject({ provider: 'openai-compatible', status: 401 });
+  });
+
+  it('reports tool_calls when finish_reason is stop but tool calls were emitted', async () => {
+    const f = vi.fn().mockResolvedValue(
+      sseResponse([tcChunk('{"a":1}'), { choices: [{ index: 0, delta: {}, finish_reason: 'stop' }] }], 'data: [DONE]\n\n'),
+    );
+    const ev = await run(createOpenAiAdapter({ apiKey: 'k', model: 'm', fetch: f }), baseReq);
+    expect(ev).toEqual([
+      { type: 'tool_call', call: { id: 'c9', name: 'fn', arguments: { a: 1 } } },
+      { type: 'done', stopReason: 'tool_calls' },
+    ]);
+  });
+
+  it('emits pending tool calls then done when the stream ends without finish_reason', async () => {
+    const f = vi.fn().mockResolvedValue(sseResponse([tcChunk('{"a":2}')]));
+    const ev = await run(createOpenAiAdapter({ apiKey: 'k', model: 'm', fetch: f }), baseReq);
+    expect(ev).toEqual([
+      { type: 'tool_call', call: { id: 'c9', name: 'fn', arguments: { a: 2 } } },
+      { type: 'done', stopReason: 'tool_calls' },
+    ]);
+  });
+
+  it('uses empty arguments for invalid tool-call JSON and keeps going', async () => {
+    const f = vi.fn().mockResolvedValue(
+      sseResponse([tcChunk('{"a":'), { choices: [{ index: 0, delta: {}, finish_reason: 'tool_calls' }] }]),
+    );
+    const ev = await run(createOpenAiAdapter({ apiKey: 'k', model: 'm', fetch: f }), baseReq);
+    expect(ev).toEqual([
+      { type: 'tool_call', call: { id: 'c9', name: 'fn', arguments: {} } },
+      { type: 'done', stopReason: 'tool_calls' },
+    ]);
+  });
 });

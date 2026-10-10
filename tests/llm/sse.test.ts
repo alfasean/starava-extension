@@ -37,4 +37,21 @@ describe('parseSse', () => {
     const r = await collect(streamOf([bytes.slice(0, 7), bytes.slice(7)]));
     expect(r).toEqual([{ data: 'é' }]);
   });
+  it('cancels the underlying stream when the consumer stops early', async () => {
+    let cancelled = false;
+    const enc = new TextEncoder();
+    const body = new ReadableStream<Uint8Array>({
+      start(c) {
+        c.enqueue(enc.encode('data: 1\n\ndata: 2\n\n'));
+      },
+      cancel() {
+        cancelled = true;
+      },
+    });
+    for await (const e of parseSse(body)) {
+      expect(e.data).toBe('1');
+      break;
+    }
+    expect(cancelled).toBe(true);
+  });
 });

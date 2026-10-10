@@ -34,6 +34,7 @@ export async function* parseSse(body: ReadableStream<Uint8Array>): AsyncIterable
     return null;
   };
 
+  let completed = false;
   try {
     for (;;) {
       const { done, value } = await reader.read();
@@ -59,7 +60,9 @@ export async function* parseSse(body: ReadableStream<Uint8Array>): AsyncIterable
     }
     const last = flush();
     if (last) yield last;
+    completed = true;
   } finally {
+    if (!completed) await reader.cancel().catch(() => {});
     reader.releaseLock();
   }
 }

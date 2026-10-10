@@ -1,3 +1,4 @@
+import type { ProviderId } from '../../settings/types';
 import { LlmHttpError } from '../errors';
 import { parseSse } from '../sse';
 import type { ChatMessage, LlmAdapter, LlmRequest, StreamEvent, ToolCall } from '../types';
@@ -6,6 +7,7 @@ interface OpenAiOptions {
   apiKey: string;
   model: string;
   baseUrl?: string;
+  provider?: ProviderId;
   fetch?: typeof fetch;
 }
 
@@ -61,7 +63,7 @@ export function createOpenAiAdapter(o: OpenAiOptions): LlmAdapter {
         body: JSON.stringify(body),
         signal: req.signal,
       });
-      if (!res.ok) throw new LlmHttpError('openai', res.status, await res.text().catch(() => ''));
+      if (!res.ok) throw new LlmHttpError(o.provider ?? 'openai', res.status, await res.text().catch(() => ''));
       if (!res.body) throw new Error('openai response has no body');
 
       const pending = new Map<number, { id: string; name: string; args: string }>();
@@ -112,7 +114,8 @@ export function createOpenAiAdapter(o: OpenAiOptions): LlmAdapter {
       }
 
       for (const call of drain()) yield { type: 'tool_call', call };
-      yield { type: 'done', stopReason: finish ?? (emittedCalls ? 'tool_calls' : 'end') };
+      const stopReason: StopReason = !finish || finish === 'end' ? (emittedCalls ? 'tool_calls' : 'end') : finish;
+      yield { type: 'done', stopReason };
     },
   };
 }
