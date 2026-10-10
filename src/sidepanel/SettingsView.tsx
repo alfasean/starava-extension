@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { saveSettings, validateSettings } from '../settings/store';
 import { SettingsValidationError, type ProviderId, type Settings } from '../settings/types';
+import { listModels, normalizeOpenAiBaseUrl } from '../llm/models';
+import { toUserFacingError } from './errors';
 import { ensureHostPermission } from './permissions';
 
 const PROVIDERS: Array<{ id: ProviderId; label: string; modelHint: string }> = [
@@ -8,6 +10,7 @@ const PROVIDERS: Array<{ id: ProviderId; label: string; modelHint: string }> = [
   { id: 'anthropic', label: 'Anthropic', modelHint: 'e.g. claude-…' },
   { id: 'gemini', label: 'Google Gemini', modelHint: 'e.g. gemini-…' },
   { id: 'openai-compatible', label: 'OpenAI-compatible', modelHint: 'e.g. llama3.1' },
+  { id: 'new-api', label: 'New API (gateway)', modelHint: 'e.g. gpt-4o-mini or claude-…' },
 ];
 
 const PACE_RE = /^(\d{1,2}):([0-5]\d)$/;
@@ -43,9 +46,36 @@ export default function SettingsView({ initial, onSaved }: Props) {
   const [warning, setWarning] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [modelOptions, setModelOptions] = useState<string[]>([]);
+  const [modelError, setModelError] = useState<string | null>(null);
+  const [loadingModels, setLoadingModels] = useState(false);
 
   const hint = PROVIDERS.find((p) => p.id === provider)?.modelHint ?? '';
-  const compatible = provider === 'openai-compatible';
+  const gateway = provider === 'new-api';
+  const needsUrl = provider === 'openai-compatible' || gateway;
+  const canLoad = needsUrl && baseUrl.trim() !== '' && apiKey.trim() !== '' && !loadingModels;
+
+  const onLoadModels = async () => {
+    setModelError(null);
+    setLoadingModels(true);
+    try {
+      const url = baseUrl.trim();
+      // Must be the first await so the click still counts as a user gesture.
+      await ensureHostPermission(url);
+      const ids = await listModels({
+        baseUrl: gateway ? normalizeOpenAiBaseUrl(url) : url,
+        apiKey: apiKey.trim(),
+        provider,
+      });
+      setModelOptions(ids);
+      if (ids.length === 0) setModelError('The gateway returned no models.');
+    } catch (err) {
+      const ufe = toUserFacingError(err);
+      setModelError(ufe ? (ufe.details ? `${ufe.message} ${ufe.details}` : ufe.message) : null);
+    } finally {
+      setLoadingModels(false);
+    }
+  };
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -57,7 +87,7 @@ export default function SettingsView({ initial, onSaved }: Props) {
       provider,
       apiKey: apiKey.trim(),
       model: model.trim(),
-      ...(compatible ? { baseUrl: baseUrl.trim() } : {}),
+      ...(needsUrl ? { baseUrl: baseUrl.trim() } : {}),
       athlete: {
         maxHr: Number(maxHr),
         restHr: Number(restHr),
@@ -74,9 +104,9 @@ export default function SettingsView({ initial, onSaved }: Props) {
     setSaving(true);
     try {
       // Request first, while the click still counts as a user gesture.
-      if (compatible && !(await ensureHostPermission(s.baseUrl!))) {
+      if (needsUrl && !(await ensureHostPermission(s.baseUrl!))) {
         setWarning(
-          'Permission to reach this base URL was not granted. Requests to it will fail until you allow it.',
+          'Permission to reach this URL was not granted. Requests to it will fail until you allow it.',
         );
       }
       await saveSettings(s);
@@ -119,18 +149,42 @@ export default function SettingsView({ initial, onSaved }: Props) {
       </label>
       <label>
         Model
-        <input value={model} placeholder={hint} spellCheck={false} onChange={(e) => setModel(e.target.value)} />
+        <input
+          value={model}
+          placeholder={hint}
+          spellCheck={false}
+          list="model-options"
+          onChange={(e) => setModel(e.target.value)}
+        />
+        <datalist id="model-options">
+          {modelOptions.map((id) => (
+            <option key={id} value={id} />
+          ))}
+        </datalist>
       </label>
-      {compatible && (
-        <label>
-          Base URL
-          <input
-            value={baseUrl}
-            placeholder="e.g. http://localhost:11434/v1"
-            spellCheck={false}
-            onChange={(e) => setBaseUrl(e.target.value)}
-          />
-        </label>
+      {needsUrl && (
+        <>
+          <label>
+            {gateway ? 'Gateway URL' : 'Base URL'}
+            <input
+              value={baseUrl}
+              placeholder={gateway ? 'https://your-gateway.example' : 'e.g. http://localhost:11434/v1'}
+              spellCheck={false}
+              onChange={(e) => setBaseUrl(e.target.value)}
+            />
+          </label>
+          <div className="actions">
+            <button type="button" className="ghost" disabled={!canLoad} onClick={onLoadModels}>
+              {loadingModels ? 'Loading…' : 'Load models'}
+            </button>
+            {modelOptions.length > 0 && <span className="muted small">{modelOptions.length} models loaded.</span>}
+          </div>
+          {modelError && (
+            <p className="warning" role="status">
+              {modelError}
+            </p>
+          )}
+        </>
       )}
       <p className="muted small">Your API key is stored locally in this browser and sent only to the provider.</p>
 

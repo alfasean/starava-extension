@@ -40,6 +40,8 @@ export function validateSettings(s: Settings): string[] {
   const baseUrl = s.baseUrl?.trim();
   if (s.provider === 'openai-compatible' && !baseUrl) {
     problems.push('Base URL is required for an OpenAI-compatible provider.');
+  } else if (s.provider === 'new-api' && !baseUrl) {
+    problems.push('Gateway URL is required for a New API gateway.');
   } else if (baseUrl && !/^https?:\/\//i.test(baseUrl)) {
     problems.push('Base URL must start with http:// or https://.');
   }

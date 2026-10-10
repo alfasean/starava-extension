@@ -43,6 +43,10 @@ describe('validateSettings', () => {
     expect(validateSettings(valid({ athlete: { maxHr: 190, restHr: 29 } })).join()).toMatch(/resting heart rate/i);
     expect(validateSettings(valid({ athlete: { maxHr: 190, restHr: 101 } })).join()).toMatch(/resting heart rate/i);
   });
+  it('requires baseUrl for new-api', () => {
+    expect(validateSettings(valid({ provider: 'new-api' })).join()).toMatch(/url/i);
+    expect(validateSettings(valid({ provider: 'new-api', baseUrl: 'https://gw.example' }))).toEqual([]);
+  });
   it('requires baseUrl for openai-compatible', () => {
     expect(validateSettings(valid({ provider: 'openai-compatible' })).join()).toMatch(/base url/i);
   });

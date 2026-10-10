@@ -13,6 +13,7 @@ const PROVIDER_NAMES: Record<ProviderId, string> = {
   anthropic: 'Anthropic',
   gemini: 'Google Gemini',
   'openai-compatible': 'Your OpenAI-compatible provider',
+  'new-api': 'Your New API gateway',
 };
 
 export function providerDisplayName(p: ProviderId): string {

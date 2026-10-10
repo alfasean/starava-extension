@@ -37,6 +37,18 @@ describe('createAdapter', () => {
     expect(err.provider).toBe('openai-compatible');
   });
 
+  it('new-api normalizes the gateway URL and uses its own provider id', async () => {
+    const { url, err } = await probe({
+      provider: 'new-api',
+      apiKey: 'k',
+      model: 'm',
+      baseUrl: 'https://gw.example',
+      athlete,
+    });
+    expect(url).toBe('https://gw.example/v1/chat/completions');
+    expect(err.provider).toBe('new-api');
+  });
+
   it('anthropic', async () => {
     const { url, err } = await probe({ provider: 'anthropic', apiKey: 'k', model: 'm', athlete });
     expect(url).toBe('https://api.anthropic.com/v1/messages');

@@ -32,6 +32,7 @@ describe('toUserFacingError', () => {
     ['openai', 401, 'OpenAI rejected the API key.'],
     ['anthropic', 403, 'Anthropic rejected the API key.'],
     ['gemini', 401, 'Google Gemini rejected the API key.'],
+    ['new-api', 401, 'Your New API gateway rejected the API key.'],
     ['openai-compatible', 401, 'Your OpenAI-compatible provider rejected the API key.'],
     ['openai', 429, 'OpenAI quota or rate limit reached.'],
     ['gemini', 429, 'Google Gemini quota or rate limit reached.'],

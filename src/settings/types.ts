@@ -1,4 +1,4 @@
-export type ProviderId = 'openai' | 'anthropic' | 'gemini' | 'openai-compatible';
+export type ProviderId = 'openai' | 'anthropic' | 'gemini' | 'openai-compatible' | 'new-api';
 
 export interface AthleteProfile {
   maxHr: number;
