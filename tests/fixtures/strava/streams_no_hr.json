@@ -1,0 +1,6 @@
+[
+  { "type": "time", "data": [0, 1, 2, 3], "series_type": "distance", "original_size": 4, "resolution": "high" },
+  { "type": "distance", "data": [0, 3.0, 6.1, 9.0], "series_type": "distance", "original_size": 4, "resolution": "high" },
+  { "type": "cadence", "data": [80, 82, 83, 83], "series_type": "distance", "original_size": 4, "resolution": "high" },
+  { "type": "moving", "data": [false, true, true, true], "series_type": "distance", "original_size": 4, "resolution": "high" }
+]

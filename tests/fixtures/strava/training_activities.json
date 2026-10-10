@@ -1,0 +1,47 @@
+{
+  "models": [
+    {
+      "id": 101,
+      "name": "Morning Long Run",
+      "sport_type": "Run",
+      "type": "Run",
+      "display_type": "Run",
+      "start_date_local_raw": 1767254400,
+      "start_time": "2026-01-01T01:00:00+0000",
+      "distance": "10.02",
+      "distance_raw": 10020.5,
+      "moving_time": "50:00",
+      "moving_time_raw": 3000,
+      "elapsed_time": "51:40",
+      "elapsed_time_raw": 3100,
+      "elevation_gain": "45",
+      "elevation_gain_raw": 45.2,
+      "workout_type": 2,
+      "trainer": false,
+      "commute": false
+    },
+    {
+      "id": 102,
+      "name": "Tempo Tuesday",
+      "type": "Run",
+      "start_date_local": "2026-01-03T07:30:00Z",
+      "distance": "8.50",
+      "moving_time": 2400,
+      "total_elevation_gain": 12,
+      "workout_type": 3
+    },
+    {
+      "id": 103,
+      "name": "Evening Ride",
+      "display_type": "Ride",
+      "start_time": "2026-01-05T18:15:00+07:00",
+      "distance": 20000,
+      "moving_time": 3600,
+      "elapsed_time": 4000,
+      "workout_type": null
+    }
+  ],
+  "page": 1,
+  "perPage": 20,
+  "total": 3
+}
