@@ -1,0 +1,6 @@
+data: {"candidates":[{"content":{"role":"model","parts":[{"text":"Let me "}]}}]}
+
+data: {"candidates":[{"content":{"role":"model","parts":[{"text":"check."}]}}]}
+
+data: {"candidates":[{"content":{"role":"model","parts":[{"functionCall":{"name":"list_activities","args":{"limit":5}}},{"functionCall":{"name":"noargs"}}]},"finishReason":"STOP"}]}
+
