@@ -18,11 +18,24 @@ const storageLocal = {
 
 const chromeMock = {
   storage: { local: storageLocal },
+  tabs: {} as {
+    query: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+  },
+  permissions: {} as {
+    request: ReturnType<typeof vi.fn>;
+    contains: ReturnType<typeof vi.fn>;
+  },
   __reset() {
     localStore = {};
+    chromeMock.tabs.query = vi.fn(async () => [] as Array<{ url?: string }>);
+    chromeMock.tabs.create = vi.fn(async () => ({}));
+    chromeMock.permissions.request = vi.fn(async () => true);
+    chromeMock.permissions.contains = vi.fn(async () => true);
   },
 };
 
+chromeMock.__reset();
 (globalThis as any).chrome = chromeMock;
 
 beforeEach(() => {

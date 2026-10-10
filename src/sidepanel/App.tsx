@@ -1,4 +1,9 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { isConfigured, loadSettings } from '../settings/store';
+import type { Settings } from '../settings/types';
+import ChatView from './ChatView';
+import SettingsView from './SettingsView';
+import './styles.css';
 
 const PROBE = import.meta.env.VITE_PROBE === '1';
 const ProbeView = PROBE ? lazy(() => import('../dev/ProbeView')) : null;
@@ -7,32 +12,47 @@ type Tab = 'chat' | 'settings' | 'probe';
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('chat');
+  const [settings, setSettings] = useState<Settings | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    void loadSettings().then((s) => {
+      if (live) setSettings(s);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const tabButton = (id: Tab, label: string) => (
+    <button role="tab" aria-selected={tab === id} className="tab" onClick={() => setTab(id)}>
+      {label}
+    </button>
+  );
+
   return (
-    <div>
-      <nav role="tablist">
-        <button role="tab" aria-selected={tab === 'chat'} onClick={() => setTab('chat')}>
-          Chat
-        </button>
-        <button role="tab" aria-selected={tab === 'settings'} onClick={() => setTab('settings')}>
-          Settings
-        </button>
-        {PROBE && (
-          <button role="tab" aria-selected={tab === 'probe'} onClick={() => setTab('probe')}>
-            Probe
-          </button>
-        )}
+    <div className="app">
+      <nav role="tablist" className="tabs">
+        {tabButton('chat', 'Chat')}
+        {tabButton('settings', 'Settings')}
+        {PROBE && tabButton('probe', 'Probe')}
       </nav>
-      <main>
-        {tab === 'probe' && ProbeView ? (
+      {/* Chat stays mounted while hidden so the conversation survives tab switches. */}
+      <main className="main" hidden={tab !== 'chat'}>
+        <ChatView configured={!!settings && isConfigured(settings)} onOpenSettings={() => setTab('settings')} />
+      </main>
+      {tab === 'settings' && (
+        <main className="main scroll">
+          {settings && <SettingsView initial={settings} onSaved={setSettings} />}
+        </main>
+      )}
+      {PROBE && ProbeView && tab === 'probe' && (
+        <main className="main scroll">
           <Suspense fallback={null}>
             <ProbeView />
           </Suspense>
-        ) : tab === 'chat' ? (
-          <p>Chat placeholder</p>
-        ) : (
-          <p>Settings placeholder</p>
-        )}
-      </main>
+        </main>
+      )}
     </div>
   );
 }
