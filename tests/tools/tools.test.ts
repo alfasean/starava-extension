@@ -226,7 +226,7 @@ describe('get_training_trend', () => {
 
   it('rejects out-of-range weeks', async () => {
     const s = setup(runs);
-    await expect(s.byName('get_training_trend').handler({ weeks: 30 }, s.ctx)).rejects.toThrow(/weeks.*1.*26/);
+    await expect(s.byName('get_training_trend').handler({ weeks: 54 }, s.ctx)).rejects.toThrow(/weeks.*1.*53/);
     await expect(s.byName('get_training_trend').handler({}, s.ctx)).rejects.toThrow(/weeks/);
   });
 

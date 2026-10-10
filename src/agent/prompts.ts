@@ -17,7 +17,7 @@ export function buildSystemPrompt(now: Date): string {
 }
 
 export const QUICK_ACTIONS: Array<{
-  id: 'analyze-current' | 'trend-4' | 'trend-12';
+  id: 'analyze-current' | 'trend-4' | 'trend-12' | 'year-to-date';
   label: string;
   prompt: string;
 }> = [
@@ -38,5 +38,11 @@ export const QUICK_ACTIONS: Array<{
     label: '12-week trend',
     prompt:
       'Show my training trend over the last 12 weeks using get_training_trend. Cover volume, load/ACWR, aerobic efficiency, injury-risk flags, and give recommendations for next week.',
+  },
+  {
+    id: 'year-to-date',
+    label: 'This year',
+    prompt:
+      'Analyze all my runs this calendar year. Call list_activities with after = January 1 of the current year and limit 200, and get_training_trend with weeks = the number of weeks since January 1 (including the current week). Cover total and monthly volume, longest runs, pace progression, load/ACWR over time, aerobic efficiency trend, consistency gaps, and give the main strengths, weaknesses and priorities for the rest of the year.',
   },
 ];

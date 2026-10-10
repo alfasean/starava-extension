@@ -130,8 +130,9 @@ describe('prompts', () => {
     expect(p).toContain(SYSTEM_PROMPT);
   });
   it('defines quick actions', () => {
-    expect(QUICK_ACTIONS.map((a) => a.id)).toEqual(['analyze-current', 'trend-4', 'trend-12']);
-    expect(QUICK_ACTIONS.map((a) => a.label)).toEqual(['Analyze this activity', '4-week trend', '12-week trend']);
+    expect(QUICK_ACTIONS.map((a) => a.id)).toEqual(['analyze-current', 'trend-4', 'trend-12', 'year-to-date']);
+    expect(QUICK_ACTIONS.map((a) => a.label)).toEqual(['Analyze this activity', '4-week trend', '12-week trend', 'This year']);
+    expect(QUICK_ACTIONS[3].prompt).toContain('January 1');
     expect(QUICK_ACTIONS[0].prompt).toContain('get_current_activity');
     expect(QUICK_ACTIONS[2].prompt).toContain('12 weeks');
   });

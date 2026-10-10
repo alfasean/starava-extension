@@ -186,15 +186,15 @@ export function createTools(deps: ToolDeps): ToolDefinition[] {
     spec: {
       name: 'get_training_trend',
       description:
-        'Weekly running trend for the last N weeks (1 to 26), oldest first: runs, km, timeSec, longestRunKm, TRIMP load, ACWR (acute/chronic load ratio) and aerobic efficiency as pace in seconds per km at HR zone 2.',
+        'Weekly running trend for the last N weeks (1 to 53), oldest first: runs, km, timeSec, longestRunKm, TRIMP load, ACWR (acute/chronic load ratio) and aerobic efficiency as pace in seconds per km at HR zone 2.',
       parameters: {
         type: 'object',
-        properties: { weeks: { type: 'integer', description: 'Number of weeks, 1 to 26.' } },
+        properties: { weeks: { type: 'integer', description: 'Number of weeks, 1 to 53.' } },
         required: ['weeks'],
       },
     },
     async handler(args, ctx: ToolContext) {
-      const weeks = intArg(args, 'weeks', 1, 26);
+      const weeks = intArg(args, 'weeks', 1, 53);
       const settings = await getSettings();
       const nowDate = now();
       const from = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
