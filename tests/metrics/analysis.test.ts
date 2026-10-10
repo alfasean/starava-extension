@@ -32,6 +32,12 @@ describe('analyzeActivity', () => {
     expect(r.hrZonesPct).not.toBeNull();
     expect(r.cadence?.meanSpm).toBe(170);
   });
+  it('reports present-but-empty streams as missing', () => {
+    const s = buildStreams({ seconds: 100, speedMps: 3, cadence: 85 });
+    s.heartrate = [];
+    const r = analyzeActivity(act, s, profile);
+    expect(r.missing).toEqual(['heartrate', 'altitude']);
+  });
   it('pace 0 when distance 0', () => {
     const r = analyzeActivity({ ...act, distanceM: 0 }, { time: [] }, profile);
     expect(r.summary.avgPaceSecPerKm).toBe(0);

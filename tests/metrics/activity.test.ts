@@ -17,6 +17,8 @@ describe('aerobicDecoupling', () => {
     const hr = (t: number) => (t > 1000 && t <= 1100 ? 100 : t <= 600 ? 150 : 165);
     const base = buildStreams({ seconds: 1300, speedMps: 3, hr, stopped: [[1000, 1100]] });
     const ref = buildStreams({ seconds: 1300, speedMps: 3, hr: (t) => (t <= 600 ? 150 : 165), stopped: [[1000, 1100]] });
+    expect(aerobicDecoupling(base)).not.toBeNull();
+    expect(aerobicDecoupling(base)).toBeCloseTo(9.09, 1);
     expect(aerobicDecoupling(base)).toBe(aerobicDecoupling(ref));
   });
 });
@@ -24,7 +26,7 @@ describe('aerobicDecoupling', () => {
 describe('trimp', () => {
   it('is ~50.14 for HR 120 over an hour', () => {
     const s = buildStreams({ seconds: 3600, speedMps: 3, hr: 120 });
-    expect(trimp(s, { maxHr: 190, restHr: 50 })).toBeCloseTo(50.14, 0);
+    expect(Math.abs((trimp(s, { maxHr: 190, restHr: 50 }) as number) - 50.14)).toBeLessThanOrEqual(0.1);
   });
   it('is null without HR', () => {
     expect(trimp(buildStreams({ seconds: 100, speedMps: 3 }), { maxHr: 190, restHr: 50 })).toBeNull();
@@ -38,6 +40,18 @@ describe('cadenceStats / paceVariability', () => {
   });
   it('cadence null when absent', () => {
     expect(cadenceStats(buildStreams({ seconds: 100, speedMps: 3 }))).toBeNull();
+  });
+  it('CV is non-zero for varying speed', () => {
+    const s = buildStreams({ seconds: 100, speedMps: 3 });
+    s.velocity_smooth = s.velocity_smooth!.map((_, i) => (i % 2 === 0 ? 2 : 4));
+    // moving samples alternate 4,2 (i>=1): mean 3, sd 1 -> CV ~0.333
+    expect(paceVariability(s)).toBeCloseTo(0.333, 2);
+  });
+  it('cadence sd is non-zero for varying cadence', () => {
+    const s = buildStreams({ seconds: 100, speedMps: 3, cadence: (t) => (t % 2 === 0 ? 80 : 90) });
+    const r = cadenceStats(s)!;
+    expect(r.meanSpm).toBeCloseTo(170, 0);
+    expect(r.sdSpm).toBeCloseTo(10, 0);
   });
   it('CV is 0 for constant speed', () => {
     expect(paceVariability(buildStreams({ seconds: 100, speedMps: 3 }))).toBe(0);
