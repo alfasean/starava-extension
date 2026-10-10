@@ -16,4 +16,7 @@ export default defineManifest({
   background: { service_worker: 'src/background.ts', type: 'module' },
   side_panel: { default_path: 'src/sidepanel/index.html' },
   action: { default_title: 'Strava Run Analyzer' },
+  ...(process.env.VITE_PROBE === '1'
+    ? { content_scripts: [{ matches: ['https://www.strava.com/*'], js: ['src/dev/probeContent.ts'] }] }
+    : {}),
 });
