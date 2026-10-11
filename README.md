@@ -24,6 +24,7 @@ You don't need a Strava subscription or a Strava API app. You do need an API key
 - [Troubleshooting](#troubleshooting)
 - [Development](#development)
 - [Known limitations](#known-limitations)
+- [Support](#support)
 
 ---
 
@@ -225,3 +226,7 @@ Contributions are welcome. Please add tests for new metrics and tools, and keep 
 - **Activity lookups** cover your 200 most recent activities. `list_activities` returns at most 200 activities per request, and trends go back at most 53 weeks.
 - **Chats are not saved.** Closing the panel or clicking **New chat** clears the conversation. Cached Strava data is kept.
 - **Not on the Chrome Web Store.** Install from source as described above.
+
+## Support
+
+This tool is and will stay 100% free — no backend, no accounts, no upsells. If it saved you a run, a one-time tip is appreciated but never expected: [github.com/sponsors/alfasean](https://github.com/sponsors/alfasean). See [SUPPORTING.md](SUPPORTING.md) for the details.
