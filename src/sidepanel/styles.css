@@ -448,6 +448,32 @@ button.stop {
   gap: 10px;
 }
 
+/* Sponsor */
+
+.sponsor {
+  padding: 8px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sponsor h2 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 12px 0 0;
+}
+
+.sponsor p,
+.sponsor ul {
+  margin: 0;
+}
+
+.sponsor ul {
+  padding-left: 20px;
+}
+
 .muted {
   color: var(--muted);
 }
