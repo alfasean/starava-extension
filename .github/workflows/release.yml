@@ -1,0 +1,40 @@
+name: Release
+
+# Push a version tag (e.g. v0.1.0) to build and publish a downloadable zip:
+#   git tag v0.1.0 && git push origin v0.1.0
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run package
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/strava-run-analyzer-v*.zip
+          body: |
+            Prebuilt build of the Strava Run Analyzer Chrome extension — no Node.js or build tools needed.
+
+            **Install:**
+            1. Download and unzip `strava-run-analyzer-vX.Y.Z.zip` into any folder.
+            2. Open `chrome://extensions` and turn on **Developer mode** (top-right).
+            3. Click **Load unpacked** and select the unzipped folder.
+            4. Log in to `strava.com`, click the extension icon, and set up your AI provider in **Settings**.
+
+            See the [README](https://github.com/alfasean/starava-extension#readme) for full setup and usage docs.

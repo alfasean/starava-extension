@@ -58,7 +58,17 @@ You don't need a Strava subscription or a Strava API app. You do need an API key
 
 ## Installation
 
-The extension is not on the Chrome Web Store. Install it from source:
+The extension is not on the Chrome Web Store. There are two ways to install it:
+
+### Option A — Download (no build tools needed)
+
+1. Go to the [latest release](https://github.com/alfasean/starava-extension/releases/latest) and download the `strava-run-analyzer-vX.Y.Z.zip` file.
+2. Unzip it into any folder.
+3. Open `chrome://extensions`.
+4. Turn on **Developer mode** (top-right).
+5. Click **Load unpacked** and select the unzipped folder.
+
+### Option B — Build from source
 
 ```bash
 git clone https://github.com/alfasean/starava-extension.git
@@ -67,14 +77,13 @@ npm install
 npm run build
 ```
 
-The build creates a `dist/` folder. To load it in Chrome:
+The build creates a `dist/` folder. Load it with the same **Load unpacked** steps as above, selecting `dist/`.
 
-1. Open `chrome://extensions`.
-2. Turn on **Developer mode** (top-right).
-3. Click **Load unpacked** and select the `dist/` folder.
-4. Optional: pin the extension from the puzzle-piece menu so its icon stays visible.
+### Both options
 
-**Updating:** run `git pull`, then `npm install` and `npm run build`, and click the **reload** icon on the extension card in `chrome://extensions`.
+Optional: pin the extension from the puzzle-piece menu so its icon stays visible.
+
+**Updating:** download the new zip (or `git pull` + `npm install` + `npm run build`), remove the old extension card in `chrome://extensions`, then **Load unpacked** the new folder.
 
 ## Setup
 
@@ -199,7 +208,14 @@ Runs without heart-rate data still count for distance and time, but are left out
 npm install
 npm test          # unit tests (Vitest)
 npm run build     # type-check and build to dist/
+npm run package   # build, then zip dist/ into release/ for GitHub Releases
 npm run icons     # regenerate extension icons from public/icons/icon.svg
+```
+
+**Releasing a new version:** bump `version` in `manifest.config.ts`, then push a matching tag — CI builds the zip and publishes it as a GitHub Release automatically:
+
+```bash
+git tag v0.1.1 && git push origin v0.1.1
 ```
 
 After changing code, run `npm run build` and reload the extension in `chrome://extensions`.
