@@ -198,6 +198,7 @@ Runs without heart-rate data still count for distance and time, but are left out
 npm install
 npm test          # unit tests (Vitest)
 npm run build     # type-check and build to dist/
+npm run icons     # regenerate extension icons from public/icons/icon.svg
 ```
 
 After changing code, run `npm run build` and reload the extension in `chrome://extensions`.

@@ -15,7 +15,21 @@ export default defineManifest({
   optional_host_permissions: ['https://*/*', 'http://localhost/*', 'http://127.0.0.1/*'],
   background: { service_worker: 'src/background.ts', type: 'module' },
   side_panel: { default_path: 'src/sidepanel/index.html' },
-  action: { default_title: 'Strava Run Analyzer' },
+  icons: {
+    16: 'icons/icon16.png',
+    32: 'icons/icon32.png',
+    48: 'icons/icon48.png',
+    128: 'icons/icon128.png',
+  },
+  action: {
+    default_title: 'Strava Run Analyzer',
+    default_icon: {
+      16: 'icons/icon16.png',
+      32: 'icons/icon32.png',
+      48: 'icons/icon48.png',
+      128: 'icons/icon128.png',
+    },
+  },
   ...(process.env.VITE_PROBE === '1'
     ? { content_scripts: [{ matches: ['https://www.strava.com/*'], js: ['src/dev/probeContent.ts'] }] }
     : {}),

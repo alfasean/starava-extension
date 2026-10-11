@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFB03A"/>
+      <stop offset="1" stop-color="#F43A0B"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <g fill="none" stroke="#FFFFFF" stroke-width="44" stroke-linecap="round" stroke-linejoin="round">
+    <!-- heartbeat pulse rising into a trend arrow -->
+    <path d="M 64 316 L 140 316 L 198 184 L 266 402 L 328 272 L 424 192"/>
+  </g>
+  <!-- arrowhead -->
+  <path d="M 442 178 L 416 250 L 356 200 Z" fill="#FFFFFF"/>
+</svg>
